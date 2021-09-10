@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                           http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--配置业务逻辑层，给spring扫描识别该包下的所有类，使用注解方式-->
+    <context:component-scan base-package="com.li.service" />
+
+    <!--引入外部资源文件-->
+    <context:property-placeholder location="classpath:jdbc.properties" />
+
+    <!--创建数据源-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}" />
+        <property name="url" value="${jdbc.url}" />
+        <property name="username" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
+    </bean>
+
+    <!--创建sqlSessionFactory-->
+    <bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="configLocation" value="classpath:mybatis.xml" />
+        <!--<property name="typeAliasesPackage" value="com.li.domain" />-->
+    </bean>
+
+    <!--底层使用了getMapper()-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--引入SqlSessionFactory类-->
+        <!--<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>-->
+        <!--扫描value里面包路径下的所有dao接口，同时给每个接口调用sqlSession.getMapper(dao接口)-->
+        <property name="basePackage" value="com.li.mapper"/>
+    </bean>
+
+</beans>
